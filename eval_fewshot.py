@@ -36,6 +36,7 @@ import json
 import transformers
 from modeling_phi import PhiForCausalLM
 from tokenization_codegen import CodeGenTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 if torch.cuda.is_available():
@@ -163,12 +164,13 @@ def get_model(
         "Please specify a --base_model, e.g. --base_model='bigcode/starcoder'"
     )
 
-    tokenizer = CodeGenTokenizer.from_pretrained(base_model)
+    tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
     tokenizer.pad_token_id = tokenizer.eos_token_id
     tokenizer.pad_token = tokenizer.eos_token
 
-    model = PhiForCausalLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         base_model,
+        trust_remote_code=True,
         device_map="auto",
     )
     model.config.pad_token_id = tokenizer.pad_token_id
